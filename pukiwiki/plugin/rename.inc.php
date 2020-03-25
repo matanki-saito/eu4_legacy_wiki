@@ -225,11 +225,11 @@ function plugin_rename_phase3($pages)
 				$exists[$_page][$old] = $new;
 
 	$pass = plugin_rename_getvar('pass');
-	if ($pass != '' && pkwk_login($pass)) {
+//	if ($pass != '' && pkwk_login($pass)) {
 		return plugin_rename_proceed($pages, $files, $exists);
-	} else if ($pass != '') {
-		$msg = plugin_rename_err('adminpass');
-	}
+//	} else if ($pass != '') {
+//		$msg = plugin_rename_err('adminpass');
+//	}
 
 	$method = plugin_rename_getvar('method');
 	if ($method == 'regex') {
