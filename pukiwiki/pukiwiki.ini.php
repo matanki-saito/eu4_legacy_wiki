@@ -130,10 +130,10 @@ $page_title = 'EU4 Wiki';
 //$script_directory_index = 'index.php';
 
 // Site admin's name (CHANGE THIS)
-$modifier = 'eu4 wiki admin';
+$modifier = 'EU4 Discord';
 
 // Site admin's Web page (CHANGE THIS)
-$modifierlink = 'http://example.com';
+$modifierlink = 'https://discord.gg/eHv9rEK';
 
 // Default page name
 $defaultpage  = 'FrontPage';     // Top / Default page
