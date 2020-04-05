@@ -243,9 +243,8 @@ $pagereading_config_dict = ':config/PageReading/dict';
 // User definition
 $auth_users = array(
 	// Username => password
-	'foo'	=> 'foo_passwd', // Cleartext
-	'bar'	=> '{x-php-md5}f53ae779077e987718cc285b14dfbe86', // PHP md5() 'bar_passwd'
-	'hoge'	=> '{SMD5}OzJo/boHwM4q5R+g7LCOx2xGMkFKRVEx',      // LDAP SMD5 'hoge_passwd'
+	'gesogeso_read'	=> '{x-php-md5}0ee5a51af1e9b74915b6c11f0dfbcc08', // PHP md5() 'ikamusume yomikomi',
+	'gesogeso_write'=> '{x-php-md5}a2e33d8830c4a17611c241b1ad1babde', // PHP md5() 'ikamusume kakikomi',
 );
 
 /////////////////////////////////////////////////
@@ -256,23 +255,20 @@ $auth_method_type	= 'pagename';	// By Page name
 
 /////////////////////////////////////////////////
 // Read auth (0:Disable, 1:Enable)
-$read_auth = 0;
+$read_auth = 1;
 
 $read_auth_pages = array(
 	// Regex		   Username
-	'#HogeHoge#'		=> 'hoge',
-	'#(NETABARE|NetaBare)#'	=> 'foo,bar,hoge',
+	'#SecretGeso_.*#'	=> 'gesogeso_read',
 );
 
 /////////////////////////////////////////////////
 // Edit auth (0:Disable, 1:Enable)
-$edit_auth = 0;
+$edit_auth = 1;
 
 $edit_auth_pages = array(
 	// Regex		   Username
-	'#BarDiary#'		=> 'bar',
-	'#HogeHoge#'		=> 'hoge',
-	'#(NETABARE|NetaBare)#'	=> 'foo,bar,hoge',
+	'##SecretGeso_.*#' => 'gesogeso_write'
 );
 
 /////////////////////////////////////////////////
