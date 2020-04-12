@@ -38,6 +38,7 @@ function plugin_comment_action()
 	if ($vars['msg'] == '') return array('msg'=>'', 'body'=>''); // Do nothing
 
 	if (preg_match('/.*http.*/i',$vars['msg'])) return array('msg'=>'', 'body'=>''); // Do nothing
+	if (preg_match('/.*http.*/i',$vars['name'])) return array('msg'=>'', 'body'=>''); // Do nothing
 	if (preg_match('/.*http.*/i',$head)) return array('msg'=>'', 'body'=>''); // Do nothing
 
 	$comment  = str_replace('$msg', $vars['msg'], PLUGIN_COMMENT_FORMAT_MSG);
