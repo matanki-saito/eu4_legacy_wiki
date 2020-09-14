@@ -148,7 +148,7 @@ $page_title = 'EU4 Wiki';
 $modifier = 'EU4 Discord';
 
 // Site admin's Web page (CHANGE THIS)
-$modifierlink = 'https://discord.gg/eHv9rEK';
+$modifierlink = 'https://discord.gg/EyYWxcZ';
 
 // Default page name
 $defaultpage  = 'FrontPage';     // Top / Default page

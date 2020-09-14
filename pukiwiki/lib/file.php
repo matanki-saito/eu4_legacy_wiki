@@ -155,6 +155,7 @@ function page_write($page, $postdata, $notimestamp = FALSE)
 	if (PKWK_READONLY) return; // Do nothing
 
 	if (preg_match('/.*Windows NT 6.1.*/i',$_SERVER['HTTP_USER_AGENT'])) return;// Do nothing
+	if (preg_match('/Safari\/[0-9A-Z]{6}$/i',$_SERVER['HTTP_USER_AGENT'])) return;// Do nothing
 
 	$postdata = make_str_rules($postdata);
 	$timestamp_to_keep = null;
