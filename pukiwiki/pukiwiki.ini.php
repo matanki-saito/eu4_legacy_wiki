@@ -151,7 +151,7 @@ $modifier = 'EU4 Discord';
 $modifierlink = 'https://discord.gg/EyYWxcZ';
 
 // Default page name
-$defaultpage  = 'FrontPage';     // Top / Default page
+$defaultpage  = 'FrontPage(old)';     // Top / Default page
 $whatsnew     = 'RecentChanges'; // Modified page list
 $whatsdeleted = 'RecentDeleted'; // Removeed page list
 $interwiki    = 'InterWikiName'; // Set InterWiki definition here
