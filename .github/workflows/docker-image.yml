@@ -10,7 +10,7 @@ on:
         required: false
 
 jobs:
-  build_and_push:
+  tagging_build_check:
     runs-on: ubuntu-latest
     steps:
       - name: Check Out Repo 
@@ -27,3 +27,35 @@ jobs:
           tag: ${{ steps.tag_version.outputs.new_tag }}
           name: Release ${{ steps.tag_version.outputs.new_tag }}
           body: ${{ steps.tag_version.outputs.changelog }}
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: ./
+          file: ./Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/eu4_legacy_wiki:${{ steps.tag_version.outputs.new_tag }}
+
+      - name: Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
+      
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ secrets.DOCKER_HUB_USERNAME }}/eu4_legacy_wiki:${{ steps.tag_version.outputs.new_tag }}
+          format: 'template'
+          template: '@/contrib/sarif.tpl'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v1
