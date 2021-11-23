@@ -36,4 +36,17 @@ jobs:
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/eu4_legacy_wiki:test
 
       - name: Image digest
-        run: echo ${{ steps.docker_build.outputs.digest }}        
+        run: echo ${{ steps.docker_build.outputs.digest }}
+      
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ secrets.DOCKER_HUB_USERNAME }}/eu4_legacy_wiki:test
+          format: 'template'
+          template: '@/contrib/sarif.tpl'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: 'trivy-results.sarif'
