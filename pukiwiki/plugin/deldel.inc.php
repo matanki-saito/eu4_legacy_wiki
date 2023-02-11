@@ -26,10 +26,13 @@ function plugin_deldel_action()
     //変数の初期化
     $mode = isset($vars['mode']) ? $vars['mode'] : NULL;
     $page = isset($vars['page']) ? $vars['page'] : NULL;
+    $date_begin_str = isset($vars['date_begin']) ? $vars['date_begin'] : NULL;
+    $date_end_str = isset($vars['date_end']) ? $vars['date_end'] : NULL;
     $amount = isset($vars['amount']) ? $vars['amount'] : NULL;
     $status = array(0 => $_deldel_messages['title_delete_error'],
                     1 => $_deldel_messages['btn_delete']);
     $body = '';
+    
     if(!isset($mode)){
         //最初のページ
         $body .= "<form method='post' action=\"$script?cmd=deldel\"><div>";
@@ -42,7 +45,9 @@ function plugin_deldel_action()
         $body .= '<option value="COUNTER">counter</option></select></div>';
         $body .= "<div>password:<input type=\"password\" name=\"pass\" size=\"12\"/>\n";
         $body .= "<div>page:<input type=\"text\" name=\"page\" size=\"5\"/>\n";
-        $body .= "<div>amount:<input type=\"text\" name=\"amount\" size=\"5\"/>\n";        
+        $body .= "<div>amount:<input type=\"text\" name=\"amount\" size=\"5\"/>\n";    
+        $body .= "<div>date begin:<input type=\"text\" name=\"date_begin\" size=\"5\"/>\n";    
+        $body .= "<div>date end:<input type=\"text\" name=\"date_end\" size=\"5\"/>\n";        
         $body .= "<input type=\"hidden\" name=\"mode\" value=\"select\"/>\n";
         $body .= "<input type=\"submit\" value=\"{$_deldel_messages['btn_search']}\" /></div></form>";
         $body .= "<p>{$_deldel_messages['msg_body_start']}</p>";
@@ -62,7 +67,7 @@ function plugin_deldel_action()
             }elseif(isset($vars['dir']) && $vars['dir']==="UPLOAD"){
                 //添付ファイル
                 $body .= "\n<form method=\"post\" action=\"$script?cmd=deldel\"><div>";
-                $retval = attach_list2($page, $amount);
+                $retval = attach_list2($page, $amount, $date_begin_str,  $date_end_str);
                 $body .= $retval['body'];
                 $body .= "<input type=\"hidden\" name=\"mode\" value=\"confirm\"/>\n<input type=\"hidden\" name=\"dir\" value=\"{$vars['dir']}\"/>\n";
                 $body .= "<input type=\"submit\" value=\"{$_deldel_messages['btn_concern']}\"/></div>\n</form>";
@@ -459,7 +464,7 @@ class AttachFile2 extends AttachFile
         $retval .= $vars['cmd'] === 'deldel' |
         $vars['cmd'] === 'freeze2' |
         $vars['cmd'] === 'unfreeze2' ?
-        "<input type=\"checkbox\" name=\"page[]\" value=\"$param\"/>" : '';
+        "<input type=\"checkbox\" checked name=\"page[]\" value=\"$param\"/>" : '';
         $retval .= "<a href=\"$script?plugin=attach&amp;pcmd=open&amp;$param\" title=\"$title\">$label</a>$count$info$freezed";
         return $retval;
     }
@@ -473,7 +478,9 @@ class AttachFiles2 extends AttachFiles
 {
     function add($file, $age)
     {
-        $this->files[$file][$age] = new AttachFile2($this->page, $file, $age);
+        $result = new AttachFile2($this->page, $file, $age);
+        $this->files[$file][$age] = $result;
+        return $result;
     }
 
 }
@@ -484,7 +491,7 @@ class AttachFiles2 extends AttachFiles
  */
 class AttachPages2 extends AttachPages
 {
-    function AttachPages2($page = '', $age = NULL, $begin= 0, $end= 100)
+    function AttachPages2($page = '', $age = NULL, $begin= 0, $end= 100, $date_begin_str, $date_end_str)
     {
 
         $dir = opendir(UPLOAD_DIR) or
@@ -495,11 +502,17 @@ class AttachPages2 extends AttachPages
         '(?:\.([0-9]+))?' : ($age ?  "\.($age)" : '');
         $pattern = "/^({$page_pattern})_((?:[0-9A-F]{2})+){$age_pattern}$/";
 
+        $date_begin = strtotime($date_begin_str);
+        $date_end = strtotime($date_end_str);
+
         $matches = array();
         $idx = 0;
         while ($file = readdir($dir)) {
-            if (! preg_match($pattern, $file, $matches))
-            continue;
+            if (! preg_match($pattern, $file, $matches)) continue;
+
+            $file_date = filemtime(UPLOAD_DIR.$file) - LOCALZONE;
+
+            if( ($file_date < $date_begin) || ($file_date > $date_end)) continue;
 
             if($idx >= $end) break;
 
@@ -511,7 +524,8 @@ class AttachPages2 extends AttachPages
                 if (! isset($this->pages[$_page])) {
                     $this->pages[$_page] = new AttachFiles2($_page);
                 }
-                $this->pages[$_page]->add($_file, $_age);
+
+                $elem = $this->pages[$_page]->add($_file, $_age);
             }
 
             $idx++;
@@ -529,7 +543,7 @@ class AttachPages2 extends AttachPages
  * @return Array   PukiWikiのプラグイン仕様に従ったもの
  *
  */
-function attach_list2($page = 1, $amount = 100)
+function attach_list2($page = 1, $amount = 100, $date_begin_str = '1999/01/01', $date_end_str='2999/01/01')
 {
     global $vars, $_attach_messages;
 
@@ -538,7 +552,7 @@ function attach_list2($page = 1, $amount = 100)
     $begin = ($page - 1) * $amount;
     $end = $begin + $amount;
 
-    $obj = new AttachPages2($refer,NULL,$begin, $end);
+    $obj = new AttachPages2($refer,NULL,$begin, $end, $date_begin_str, $date_end_str);
 
     $msg = $_attach_messages[($refer == '') ? 'msg_listall' : 'msg_listpage'];
     $body = ($refer == '' || isset($obj->pages[$refer])) ?
