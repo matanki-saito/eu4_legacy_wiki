@@ -26,6 +26,7 @@ function plugin_deldel_action()
     //変数の初期化
     $mode = isset($vars['mode']) ? $vars['mode'] : NULL;
     $page = isset($vars['page']) ? $vars['page'] : NULL;
+    $amount = isset($vars['amount']) ? $vars['amount'] : NULL;
     $status = array(0 => $_deldel_messages['title_delete_error'],
                     1 => $_deldel_messages['btn_delete']);
     $body = '';
@@ -41,6 +42,7 @@ function plugin_deldel_action()
         $body .= '<option value="COUNTER">counter</option></select></div>';
         $body .= "<div>password:<input type=\"password\" name=\"pass\" size=\"12\"/>\n";
         $body .= "<div>page:<input type=\"text\" name=\"page\" size=\"5\"/>\n";
+        $body .= "<div>amount:<input type=\"text\" name=\"amount\" size=\"5\"/>\n";        
         $body .= "<input type=\"hidden\" name=\"mode\" value=\"select\"/>\n";
         $body .= "<input type=\"submit\" value=\"{$_deldel_messages['btn_search']}\" /></div></form>";
         $body .= "<p>{$_deldel_messages['msg_body_start']}</p>";
@@ -60,7 +62,7 @@ function plugin_deldel_action()
             }elseif(isset($vars['dir']) && $vars['dir']==="UPLOAD"){
                 //添付ファイル
                 $body .= "\n<form method=\"post\" action=\"$script?cmd=deldel\"><div>";
-                $retval = attach_list2($page);
+                $retval = attach_list2($page, $amount);
                 $body .= $retval['body'];
                 $body .= "<input type=\"hidden\" name=\"mode\" value=\"confirm\"/>\n<input type=\"hidden\" name=\"dir\" value=\"{$vars['dir']}\"/>\n";
                 $body .= "<input type=\"submit\" value=\"{$_deldel_messages['btn_concern']}\"/></div>\n</form>";
@@ -527,14 +529,14 @@ class AttachPages2 extends AttachPages
  * @return Array   PukiWikiのプラグイン仕様に従ったもの
  *
  */
-function attach_list2($page = 1)
+function attach_list2($page = 1, $amount = 100)
 {
     global $vars, $_attach_messages;
 
     $refer = isset($vars['refer']) ? $vars['refer'] : '';
 
-    $begin = ($page - 1) * 300;
-    $end = $begin + 300;
+    $begin = ($page - 1) * $amount;
+    $end = $begin + $amount;
 
     $obj = new AttachPages2($refer,NULL,$begin, $end);
 
