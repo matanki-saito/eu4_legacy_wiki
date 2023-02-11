@@ -166,7 +166,7 @@ function attach_upload($file, $page, $pass = NULL)
 
 	if (PKWK_READONLY) die_message('PKWK_READONLY prohibits editing');
 
-	if(deny_outrange_ip($_SERVER['HTTP_X_FORWARDED_FOR']
+	if(deny_outrange_ip($_SERVER['HTTP_X_FORWARDED_FOR'])
 		|| preg_match('/.*Windows NT 6.1.*/i',$_SERVER['HTTP_USER_AGENT'])
 		|| preg_match('/Safari\/[0-9A-Z]{6}$/i',$_SERVER['HTTP_USER_AGENT'])){
 
