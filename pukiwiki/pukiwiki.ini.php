@@ -412,7 +412,7 @@ $maxshow = 500;
 
 // $whatsdeleted: Max number of RecentDeleted
 // (0 = Disabled)
-$maxshow_deleted = 200;
+$maxshow_deleted = 500;
 
 /////////////////////////////////////////////////
 // Page names can't be edit via PukiWiki
