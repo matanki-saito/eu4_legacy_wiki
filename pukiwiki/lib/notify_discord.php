@@ -45,7 +45,7 @@ function pkwk_discord_notify($message,$webhook_url, $footer = array(), $salt){
 	                ],
 					[
 	                    "name" => "X-Forwarded-For",
-	                    "value" => $_SERVER['HTTP_X_FORWARDED_FOR'] != null ? crypt($_SERVER['HTTP_X_FORWARDED_FOR'], $salt) : 'undefined',
+	                    "value" => $_SERVER['HTTP_X_FORWARDED_FOR'] != null ? $_SERVER['HTTP_X_FORWARDED_FOR'] : 'undefined',
 	                    "inline" => false
 	                ]
 	            ]
