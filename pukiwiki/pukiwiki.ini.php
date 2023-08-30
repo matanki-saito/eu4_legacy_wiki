@@ -33,7 +33,7 @@ if (! defined('PKWK_OPTIMISE'))
 // PKWK_READONLY - Prohibits editing and maintain via WWW
 //   NOTE: Counter-related functions will work now (counter, attach count, etc)
 if (! defined('PKWK_READONLY'))
-	define('PKWK_READONLY', 0); // 0 or 1
+	define('PKWK_READONLY', 1); // 0 or 1
 
 // PKWK_SAFE_MODE - Prohibits some unsafe(but compatible) functions 
 if (! defined('PKWK_SAFE_MODE'))
