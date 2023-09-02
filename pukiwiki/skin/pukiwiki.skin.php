@@ -123,7 +123,7 @@ function onSubmit(event){
 window.addEventListener('load', function() {
   var w= document.getElementsByTagName('input');
   for(var i=0;i<w.length;i++){
-    if(w[i].type === 'submit' && w[i].name !== 'preview'){
+    if(w[i].type === 'submit' && w[i].name !== 'preview' && w[i].value !== '検索'){
       w[i].addEventListener('click', onSubmit, false);
     }
   }
