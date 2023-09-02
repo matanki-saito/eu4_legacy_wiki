@@ -43,10 +43,6 @@ if ($notify) {
 	require(LIB_DIR . 'mail.php'); // Mail notification
 }
 
-if ($notify_discord) {
-	require(LIB_DIR . 'notify_discord.php');
-}
-
 /////////////////////////////////////////////////
 // Main
 if ($vars['page'] === FALSE) {

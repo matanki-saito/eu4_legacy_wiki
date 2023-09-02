@@ -104,75 +104,12 @@ function get_filename($page)
 	return DATA_DIR . encode($page) . '.txt';
 }
 
-function download_deny_ip_file($filename){
-    $fp = fopen("http://www.vpngate.net/api/iphone/", 'r');
-    $fpw = fopen($filename, 'w');
-    $size = 0;
-    
-    while (!feof($fp)) {
-        $buffer = fread($fp, 1024);
-        if ($buffer === false) {
-            $size = false;
-            break;
-        }
- 
-        $wsize = fwrite($fpw, $buffer);
-        if ($wsize === false) {
-            $size = false;
-            break;
-        }
- 
-        $size += $wsize;
-    }
- 
-    fclose($fp);
-    fclose($fpw);
-    return $size;
-}
-
-// check IP
-function deny_outrange_ip($ip){
-
-    $file_name = CACHE_DIR . 'deny_ips.csv';
-
-    // ファイルがないか、60分以上古ければIPリストを更新
-    if (!file_exists($file_name) || (filemtime($file_name) < (time() - 3600))) {
-        download_deny_ip_file($file_name);
-    }
-
-    $handle = fopen($file_name, "r");
-    
-    $ips = array();
-    while (($data = fgetcsv($handle)) !== FALSE) {
-        array_push($ips,$data[1]);
-    }
-
-    return in_array($ip,$ips);
-}
-
 // Put a data(wiki text) into a physical file(diff, backup, text)
 function page_write($page, $postdata, $notimestamp = FALSE)
 {
-	global $notify_discord, $notify_discord_diff_only, $notify_discord_channel_url_failed, $notify_discord_crypt_ip_salt;
 	global $autoalias, $aliaspage;
 
 	if (PKWK_READONLY) return; // Do nothing
-
-	if(deny_outrange_ip($_SERVER['HTTP_X_FORWARDED_FOR'])
-		|| preg_match('/.*Windows NT 6.1.*/i',$_SERVER['HTTP_USER_AGENT'])
-		|| preg_match('/Safari\/[0-9A-Z]{6}$/i',$_SERVER['HTTP_USER_AGENT'])){
-
-			if($notify_discord){
-				if ($notify_discord_diff_only) $str = preg_replace('/^[^-+].*\n/m', '', $str);
-				$footer['ACTION'] = 'reject';
-				$footer['PAGE']   = $page;
-				$footer['URI']    = get_page_uri($page, PKWK_URI_ABSOLUTE);
-				pkwk_discord_notify($str, $notify_discord_channel_url_failed, $footer, $notify_discord_crypt_ip_salt) or
-					die('pkwk_discord_notify(): Failed');
-			}
-
-			return;// Do nothing
-	}
 
 	$postdata = make_str_rules($postdata);
 	$timestamp_to_keep = null;
@@ -400,9 +337,8 @@ function file_head($file, $count = 1, $lock = TRUE, $buffer = 8192)
 // Output to a file
 function file_write($dir, $page, $str, $notimestamp = FALSE, $is_delete = FALSE)
 {
-	global $_msg_invalidiwn, $notify, $notify_diff_only, $notify_subject, $notify_discord, $notify_discord_diff_only, $notify_discord_crypt_ip_salt;
+	global $_msg_invalidiwn, $notify, $notify_diff_only, $notify_subject;
 	global $whatsdeleted, $maxshow_deleted;
-	global $notify_discord_channel_url_success;
 
 	if (PKWK_READONLY) return; // Do nothing
 	if ($dir != DATA_DIR && $dir != DIFF_DIR) die('file_write(): Invalid directory');
@@ -478,13 +414,6 @@ function file_write($dir, $page, $str, $notimestamp = FALSE, $is_delete = FALSE)
 		$footer['REMOTE_ADDR'] = TRUE;
 		pkwk_mail_notify($notify_subject, $str, $footer) or
 			die('pkwk_mail_notify(): Failed');
-	} else if ($dir == DIFF_DIR && $notify_discord) {
-		if ($notify_discord_diff_only) $str = preg_replace('/^[^-+].*\n/m', '', $str);
-		$footer['ACTION'] = 'Page update';
-		$footer['PAGE']   = $page;
-		$footer['URI']    = get_page_uri($page, PKWK_URI_ABSOLUTE);
-		pkwk_discord_notify($str, $notify_discord_channel_url_success, $footer, $notify_discord_crypt_ip_salt) or
-			die('pkwk_discord_notify(): Failed');
 	}
 	if ($dir === DIFF_DIR) {
 		pkwk_log_updates($page, $str);

@@ -9,16 +9,6 @@
 // PukiWiki main setting file
 
 /////////////////////////////////////////////////
-// spam
-//
-        define('SPAM_FILTER_COND', '#atag() or #onlyeng() or #filename() or #uaunknown() or #ipcountry() or #formname()');
-        define('SPAM_FILTER_NGREG_PLUGIN_NAME', 'comment,pcomment');
-        define('SPAM_FILTER_WHITEREG', '/google\.(com|co\.jp)/i');
-        define('SPAM_FILTER_RECAPTCHA_PUBLICKEY',  getenv('SPAM_FILTER_RECAPTCHA_PUBLICKEY'));
-        define('SPAM_FILTER_RECAPTCHA_PRIVATEKEY',  getenv('SPAM_FILTER_RECAPTCHA_PRIVATEKEY'));
-        define('SPAM_FILTER_CAPTCHA_COND', '#url and (#ipcountry() or #ipdnsbl() or #onlyeng())');
-
-/////////////////////////////////////////////////
 // Functionality settings
 
 // PKWK_OPTIMISE - Ignore verbose but understandable checking and warning
@@ -511,15 +501,6 @@ $notify_subject = '[PukiWiki] $page';
 // Mail header
 // NOTE: Multiple items must be divided by "\r\n", not "\n".
 $notify_header = '';
-
-////////////////////////////////////////////////
-// Notify you via dicrod
-
-$notify_discord = 1;
-$notify_discord_channel_url_success = getenv('NOTIFY_DISCORD_CHANNEL_URL_SUCCESS');
-$notify_discord_channel_url_failed = getenv('NOTIFY_DISCORD_CHANNEL_URL_FAILED');
-$notify_discord_crypt_ip_salt = getenv('NOTIFY_DISCORD_CRYPT_IP_SALT');
-$notify_discord_diff_only = 1;
 
 /////////////////////////////////////////////////
 // Mail: POP / APOP Before SMTP

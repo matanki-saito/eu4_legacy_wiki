@@ -162,24 +162,8 @@ function attach_filelist()
 function attach_upload($file, $page, $pass = NULL)
 {
 	global $_attach_messages, $notify, $notify_subject;
-	global $notify_discord, $notify_discord_diff_only,$notify_discord_channel_url_success, $notify_discord_channel_url_failed, $notify_discord_crypt_ip_salt;
 
 	if (PKWK_READONLY) die_message('PKWK_READONLY prohibits editing');
-
-	if(deny_outrange_ip($_SERVER['HTTP_X_FORWARDED_FOR'])
-		|| preg_match('/.*Windows NT 6.1.*/i',$_SERVER['HTTP_USER_AGENT'])
-		|| preg_match('/Safari\/[0-9A-Z]{6}$/i',$_SERVER['HTTP_USER_AGENT'])){
-
-			if($notify_discord){
-				$footer['ACTION'] = 'Reject attach';
-				$footer['PAGE']   = $page;
-				$footer['URI']    = get_page_uri($page, PKWK_URI_ABSOLUTE);
-				pkwk_discord_notify("Reject attach:" . $file['name'] , $notify_discord_channel_url_failed, $footer, $notify_discord_crypt_ip_salt) or
-					die('pkwk_discord_notify(): Failed');
-			}
-
-			return array('result'=>FALSE);
-	}
 
 	// Check query-string
 	$query = 'plugin=attach&amp;pcmd=info&amp;refer=' . rawurlencode($page) .
@@ -246,22 +230,6 @@ function attach_upload($file, $page, $pass = NULL)
 
 		pkwk_mail_notify($notify_subject, "\n", $footer) or
 			die('pkwk_mail_notify(): Failed');
-	}
-
-	if($notify_discord){
-		$footer['ACTION'] = 'File attached';
-		$footer['PAGE']   = $page;
-		$footer['URI']      = get_base_uri(PKWK_URI_ABSOLUTE) .
-			// MD5 may heavy
-			'?plugin=attach' .
-				'&refer=' . rawurlencode($page) .
-				'&file='  . rawurlencode($file['name']) .
-				'&pcmd=info';
-		$footer['USER_AGENT']  = TRUE;
-		$footer['HTTP_X_FORWARDED_FOR'] = TRUE;
-
-		pkwk_discord_notify("File attached:" . $file['name'], $notify_discord_channel_url_success, $footer, $notify_discord_crypt_ip_salt) or
-			die('pkwk_discord_notify(): Failed');
 	}
 
 	return array(

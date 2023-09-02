@@ -76,52 +76,59 @@ header('Content-Type: text/html; charset=' . CONTENT_CHARSET);
  <link rel="alternate" type="application/rss+xml" title="RSS" href="<?php echo $link['rss'] ?>" /><?php // RSS auto-discovery ?>
 <script src="https://www.google.com/recaptcha/api.js?render=<?php echo RE_CAPTCHA_V3_USER; ?>"></script>
 <script>
+const fpPromise = import('https://openfpcdn.io/fingerprintjs/v4')
+  .then(FingerprintJS => FingerprintJS.load())
 
 function onSubmit(event){
+  event.preventDefault();
   const formElement = this.form;
   const target = event.target;
 
-  //ここに送信ボタンの二重押下制御処理を記載
   grecaptcha.ready(function() {
-    try{
-      grecaptcha.execute('<?php echo RE_CAPTCHA_V3_USER; ?>', {action: 'homepage'})
-      .then(function(token) {
-        //トークン取得が成功した場合
-		//ここに、formのhiddenなどにtokenを格納する処理を記載
-		const q = document.createElement('input');
-		q.type= 'hidden';
-		q.value = token;
-		q.name = 'reCapchaToken';
-		formElement.appendChild(q);
+    fpPromise
+    .then(fp => fp.get())
+    .then(result => {
+      try{
+        grecaptcha.execute('<?php echo RE_CAPTCHA_V3_USER; ?>', {action: 'homepage'})
+        .then(function(token) {
+          const q = document.createElement('input');
+          q.type= 'hidden';
+          q.value = token;
+          q.name = 'reCapchaToken';
+          formElement.appendChild(q);
 
-		const m = document.createElement('input');
-		m.type= 'hidden';
-		m.value = target.value;
-		m.name = target.name;
-		formElement.appendChild(m);
+          const m = document.createElement('input');
+          m.type= 'hidden';
+          m.value = target.value + '';
+          m.name = target.name + '';
+          formElement.appendChild(m);
 
-		formElement.submit(); //実際にサーバーに送信
-      }, function(reason) {
-        //トークン取得が失敗した場合（then関数のエラー処理、現状reasonは返されない）
-        //ここにエラー処理を記載（メッセージを表示し送信ボタンの押下制御を戻す）
-		console.log("reCapcha token error");
-      });
-    }catch(e){
-      //ここにエラー処理を記載（メッセージを表示し送信ボタンの押下制御を戻す）
-	  console.log("reCapcha token error. Please reflesh page");
-    }
+          const f = document.createElement('input');
+          f.type= 'hidden';
+          f.value = result.visitorId;
+          f.name = 'fingerprint';
+          formElement.appendChild(f);
+  
+          formElement.submit();
+        }, function(reason) {
+          console.log("reCapcha token error");
+        });
+      }catch(e){
+        console.log("reCapcha token error. Please reflesh page");
+      }
+    })
+	  .catch(error => console.error(error))
   });
 }
 
 window.addEventListener('load', function() {
   var w= document.getElementsByTagName('input');
   for(var i=0;i<w.length;i++){
-	if(w[i].type === 'button' && (w[i].name === 'write' || w[i].name === 'comment' || w[i].name === 'pcomment')){
-	  w[i].addEventListener('click', onSubmit, false);
-	}
+    if(w[i].type === 'submit'){
+      w[i].addEventListener('click', onSubmit, false);
+    }
   }
 })
-
 </script>
 
 <!-- Global site tag (gtag.js) - Google Analytics -->

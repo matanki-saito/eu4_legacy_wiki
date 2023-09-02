@@ -425,7 +425,7 @@ $template
   <br />
   <div style="float:left;">
    <input type="submit" name="preview" value="$btn_preview" accesskey="p" />
-   <input type="button" name="write"   value="$_btn_update" accesskey="s" />
+   <input type="submit" name="write"   value="$_btn_update" accesskey="s" />
    $add_top
    $add_notimestamp
   </div>
