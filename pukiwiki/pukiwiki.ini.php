@@ -91,7 +91,6 @@ makeDirIfNotExist(BACKUP_DIR);
 makeDirIfNotExist(CACHE_DIR);
 makeDirIfNotExist(UPLOAD_DIR);
 makeDirIfNotExist(COUNTER_DIR);
-makeDirIfNotExist(TRACKBACK_DIR);
 
 /////////////////////////////////////////////////
 // Directory settings II (ended with '/')

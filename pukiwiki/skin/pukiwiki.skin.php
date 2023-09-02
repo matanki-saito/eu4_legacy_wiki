@@ -81,8 +81,9 @@ const fpPromise = import('https://openfpcdn.io/fingerprintjs/v4')
 
 function onSubmit(event){
   event.preventDefault();
-  const formElement = this.form;
-  const target = event.target;
+  const formData = new FormData(this.form);
+  formData.append(event.target.name, event.target.value);
+  const action = this.form.action;
 
   grecaptcha.ready(function() {
     fpPromise
@@ -91,25 +92,23 @@ function onSubmit(event){
       try{
         grecaptcha.execute('<?php echo RE_CAPTCHA_V3_USER; ?>', {action: 'homepage'})
         .then(function(token) {
-          const q = document.createElement('input');
-          q.type= 'hidden';
-          q.value = token;
-          q.name = 'reCapchaToken';
-          formElement.appendChild(q);
+          const request = new Request(action, {
+            method: 'POST',
+            headers: {
+              'reCapchaToken': token,
+              'fingerprint' : result.visitorId
+            },
+            body: formData,
+          });
 
-          const m = document.createElement('input');
-          m.type= 'hidden';
-          m.value = target.value + '';
-          m.name = target.name + '';
-          formElement.appendChild(m);
+          fetch(request)
+          .then(res => {
+              if(res.redirected){
+                console.log(res)
+                window.location.href = res.url
+              }
+          });
 
-          const f = document.createElement('input');
-          f.type= 'hidden';
-          f.value = result.visitorId;
-          f.name = 'fingerprint';
-          formElement.appendChild(f);
-  
-          formElement.submit();
         }, function(reason) {
           console.log("reCapcha token error");
         });
@@ -124,7 +123,7 @@ function onSubmit(event){
 window.addEventListener('load', function() {
   var w= document.getElementsByTagName('input');
   for(var i=0;i<w.length;i++){
-    if(w[i].type === 'submit'){
+    if(w[i].type === 'submit' && w[i].name !== 'preview'){
       w[i].addEventListener('click', onSubmit, false);
     }
   }
